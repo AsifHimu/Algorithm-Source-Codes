@@ -21,9 +21,10 @@ void processPat(string pat,long long M,long long lps[]){
             }
         }
     }
-    for(i=0;i<M;i++){
+   /* for(i=0;i<M;i++){
         cout<<lps[i]<<" ";
     }
+    */
 }
 int Search(string txt,string pat){
     long long M,N,i,j,cnt=0;
