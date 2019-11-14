@@ -50,6 +50,7 @@ int patternSearch(string text, string pattern){
 
 int main(){
     int t,cas=0;
+    cin>>t;
     while(t--){
         string text,pattern;
         cin>>text>>pattern;
