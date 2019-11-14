@@ -1,67 +1,60 @@
-#include <bits/stdc++.h>
+///Getting TLE -_-
+///From Tusher Roy
+
+#include<bits/stdc++.h>
 using namespace std;
-#define d 256
+#define prime 101
 
-int Search(string pat, string txt, int q){
-    int cnt=0;
-	int M=pat.size();
-	int N=txt.size();
-	int i,j;
-	int p = 0; // hash value for pattern
-	int t = 0; // hash value for txt
-	int h = 1;
-
-	// The value of h would be "pow(d, M-1)%q"
-	for (i = 0; i < M - 1; i++){
-		h = (h * d) % q;
-	}
-
-	// Calculate the hash value of pattern and first
-	// window of text
-	for (i = 0; i < M; i++){
-		p = (d * p + pat[i]) % q;
-		t = (d * t + txt[i]) % q;
-	}
-	// Slide the pattern over text one by one
-	for (i = 0; i <= N - M; i++){
-		// Check the hash values of current window of text
-		// and pattern. If the hash values match then only
-		// check for characters on by one
-		if ( p == t ){
-			/* Check for characters one by one */
-			for (j = 0; j < M; j++){
-				if (txt[i+j] != pat[j]){
-					break;
-				}
-			}
-
-			// if p == t and pat[0...M-1] = txt[i, i+1, ...i+M-1]
-			if (j == M){
-				//cout<<"Pattern found at index "<< i<<endl;
-				cnt++;
-			}
-		}
-		// Calculate hash value for next window of text: Remove
-		// leading digit, add trailing digit
-		if ( i < N-M ){
-			t = (d*(t - txt[i]*h) + txt[i+M])%q;
-			// We might get negative value of t, converting it
-			// to positive
-			if (t < 0)
-			t = (t + q);
-		}
-	}
-	return cnt;
+long long createHash(string str, int end){
+    long long hash = 0;
+    for (int i = 0 ; i <= end; i++) {
+        hash += str[i]*pow(prime,i);
+    }
+    return hash;
 }
+ long long recalculateHash(string str,int oldIndex, int newIndex,long long oldHash, int patternLen) {
+   long long newHash = oldHash - str[oldIndex];
+    newHash = newHash/prime;
+    newHash += str[newIndex]*pow(prime, patternLen - 1);
+    return newHash;
+}
+ bool checkEqual(string str1,int start1,int end1, string str2,int start2,int end2){
+    if(end1 - start1 != end2 - start2) {
+        return false;
+    }
+    while(start1 <= end1 && start2 <= end2){
+        if(str1[start1] != str2[start2]){
+            return false;
+        }
+        start1++;
+        start2++;
+    }
+    return true;
+}
+int patternSearch(string text, string pattern){
+    int cnt=0;
+    int m = pattern.size();
+    int n = text.size();
+    long long patternHash = createHash(pattern, m - 1);
+    long long textHash = createHash(text, m - 1);
+    for (int i = 1; i <= n - m + 1; i++) {
+        if(patternHash == textHash && checkEqual(text, i - 1, i + m - 2, pattern, 0, m - 1)) {
+            cnt++;
+        }
+        if(i < n - m + 1) {
+            textHash = recalculateHash(text, i - 1, i + m - 1, textHash, m);
+        }
+    }
+    return cnt;
+}
+
 int main(){
-	int q = 3;
-	int t,cas=0;
-    cin>>t;
+    int t,cas=0;
     while(t--){
         string text,pattern;
         cin>>text>>pattern;
         printf("Case %d: ",++cas);
-        cout<<Search(pattern,text,q)<<endl;
+        cout<<patternSearch(text,pattern)<<endl;
     }
-	return 0;
+    return 0;
 }
